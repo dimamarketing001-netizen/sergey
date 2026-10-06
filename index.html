@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="description" content="Сергей Головенькин — ведущий свадеб, корпоративов, выпускных и юбилеев. Живое ведение без шаблонного сценария: чувствую зал, собираю людей и держу настроение вечера." />
+  <meta property="og:title" content="Сергей Головенькин — ведущий мероприятий" />
+  <meta property="og:description" content="Читаю зал, а не сценарий. Свадьбы, корпоративы, выпускные и юбилеи." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/1qdBh9M3MoveJ8wVZ_1Tf1VRCEDx-7Yfk=w1600" />
+  <title>Сергей Головенькин — ведущий мероприятий</title>
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+  <link rel="preconnect" href="https://drive.google.com" />
+  <style>
+:root{
+  --black:#0b0b0b;
+  --paper:#f2efe8;
+  --lime:#d8ff3e;
+  --orange:#ff5c35;
+  --line:rgba(11,11,11,.22);
+  --white:#fff;
+  --pad:clamp(20px,4vw,64px);
+  --radius:28px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--black)}
+body{margin:0;background:var(--paper);color:var(--black);font-family:Arial,Helvetica,sans-serif;font-size:16px;overflow-x:hidden}
+button,input,select{font:inherit}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%}
+button{color:inherit}
+::selection{background:var(--lime);color:var(--black)}
+.noise{position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E")}
+.topbar{position:fixed;z-index:100;left:18px;right:18px;top:16px;height:62px;border-radius:999px;background:rgba(242,239,232,.88);backdrop-filter:blur(18px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 10px 0 22px;border:1px solid rgba(255,255,255,.3);box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.brand{font-size:18px;font-weight:900;letter-spacing:-.03em}.brand span{color:var(--orange)}
+.nav{display:flex;gap:28px;font-size:12px;text-transform:uppercase;letter-spacing:.12em}.nav a{opacity:.66;transition:.2s}.nav a:hover{opacity:1}
+.pill{justify-self:end;border:0;border-radius:999px;background:var(--black);color:white;padding:14px 20px;text-transform:uppercase;font-size:11px;letter-spacing:.1em;cursor:pointer}
+.hero{height:max(760px,100svh);min-height:700px;background:#090909;position:relative;color:white;overflow:hidden}
+.hero-media{position:absolute;inset:0}.hero-media img{width:100%;height:100%;object-fit:cover;object-position:65% 50%;filter:grayscale(1) contrast(1.08)}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.76) 0%,rgba(0,0,0,.32) 45%,rgba(0,0,0,.05) 72%),linear-gradient(0deg,rgba(0,0,0,.78),transparent 48%)}
+.hero-copy{position:relative;z-index:2;height:100%;padding:128px var(--pad) 48px;display:flex;flex-direction:column;justify-content:space-between}
+.eyebrow{text-transform:uppercase;font-size:11px;letter-spacing:.18em;margin:0;opacity:.72}
+.hero h1{font-size:clamp(70px,12vw,190px);line-height:.76;letter-spacing:-.08em;text-transform:uppercase;margin:8vh 0 0;font-weight:900}.hero h1 span{display:block}.hero h1 span:nth-child(2){margin-left:8vw;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.78)}
+.hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}.hero-line{font-size:clamp(28px,4.6vw,72px);line-height:.92;letter-spacing:-.055em;margin:0}.hero-line strong{font-weight:400;color:var(--lime)}
+.hero-actions{display:flex;align-items:flex-end;gap:32px}.round-cta{width:142px;height:142px;border:0;border-radius:50%;background:var(--lime);display:flex;flex-direction:column;justify-content:space-between;padding:24px;cursor:pointer;transition:transform .25s}.round-cta:hover{transform:rotate(-5deg) scale(1.04)}.round-cta span{text-align:left;text-transform:uppercase;font-weight:900;font-size:13px;line-height:1.05}.round-cta b{text-align:right;font-size:28px}.text-link{font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.marquee{background:var(--lime);overflow:hidden;border-bottom:1px solid var(--black);border-top:1px solid var(--black)}.marquee-track{display:flex;width:max-content;animation:marquee 24s linear infinite}.marquee span{font-size:clamp(20px,2vw,34px);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;white-space:nowrap;padding:15px 0}@keyframes marquee{to{transform:translateX(-50%)}}
+.section-pad{padding:clamp(80px,11vw,170px) var(--pad)}
+.section-label{text-transform:uppercase;font-size:11px;letter-spacing:.15em;border-top:1px solid var(--line);padding-top:14px;margin-bottom:clamp(52px,7vw,96px);opacity:.62}.section-label.light{border-color:rgba(255,255,255,.28);color:white}
+.manifest-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:8vw;align-items:start}.manifest h2,.formats h2,.video-head h2,.gallery h2,.process h2,.contact h2,.modal h2{font-size:clamp(58px,8vw,132px);line-height:.84;letter-spacing:-.075em;text-transform:uppercase;margin:0;font-weight:900}.manifest h2 em,.formats h2 em,.video-head h2 em,.gallery h2 em,.process h2 em,.contact h2 em,.modal h2 em{font-family:Georgia,'Times New Roman',serif;font-weight:400;text-transform:none}.manifest-copy{padding-top:10px}.manifest-copy p{max-width:650px;line-height:1.55;font-size:17px}.manifest-copy .lead{font-size:clamp(24px,2.6vw,40px);line-height:1.15;letter-spacing:-.035em;margin-top:0}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);margin-top:10vw;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.principles article{padding:28px 30px 36px 0;border-right:1px solid var(--line);min-height:240px}.principles article+article{padding-left:30px}.principles article:last-child{border-right:0}.principles b{font-size:11px;opacity:.5}.principles h3{font-size:26px;letter-spacing:-.04em;margin:56px 0 8px}.principles p{margin:0;line-height:1.45;opacity:.74;max-width:340px}
+.portrait-break{height:min(82vw,920px);min-height:650px;background:var(--orange);position:relative;overflow:hidden;padding:4vw}.portrait-card{position:absolute;margin:0;overflow:hidden;border-radius:20px;box-shadow:0 20px 70px rgba(0,0,0,.18)}.portrait-card img{width:100%;height:100%;object-fit:cover}.portrait-card.p1{left:5vw;top:8%;width:28vw;max-width:410px;height:58%;transform:rotate(-4deg)}.portrait-card.p2{right:5vw;bottom:6%;width:31vw;max-width:460px;height:62%;transform:rotate(4deg)}.portrait-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font-size:clamp(52px,8vw,126px);line-height:.84;letter-spacing:-.07em;text-transform:uppercase;text-align:center;font-weight:900;width:76%;z-index:2}.portrait-word strong{color:var(--lime);font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;text-transform:none}
+.formats-head{display:grid;grid-template-columns:1.6fr .5fr;gap:5vw;align-items:end;margin-bottom:8vw}.formats-head>p{line-height:1.5;opacity:.62;max-width:250px}
+.format-list{border-top:1px solid var(--black)}.format-item{border-bottom:1px solid var(--black)}.format-title{width:100%;display:grid;grid-template-columns:80px 1fr 60px;align-items:center;border:0;background:transparent;padding:24px 0;cursor:pointer;text-align:left}.format-title .num{font-size:11px;opacity:.52}.format-title .name{font-size:clamp(44px,7vw,110px);line-height:.94;letter-spacing:-.065em;font-weight:900;text-transform:uppercase}.format-title .arrow{font-size:34px;text-align:right;transition:transform .35s}.format-item.is-open .arrow{transform:rotate(180deg)}.format-body{display:grid;grid-template-columns:1fr 1fr;gap:5vw;max-height:0;overflow:hidden;opacity:0;transition:max-height .7s ease,opacity .5s ease,padding .5s ease;padding:0}.format-item.is-open .format-body{max-height:900px;opacity:1;padding:14px 0 54px}.format-text{padding-left:80px}.format-text .big{font-size:clamp(22px,2.4vw,36px);line-height:1.15;letter-spacing:-.035em;margin:0 0 24px}.format-text p{line-height:1.55;max-width:620px}.format-text ul{list-style:none;padding:20px 0 0;margin:0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}.format-text li{border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px}.format-body img{aspect-ratio:4/3;object-fit:cover;border-radius:20px;filter:saturate(.9)}
+.video-section{background:var(--black);color:white;padding-bottom:clamp(70px,8vw,120px);overflow:hidden}.video-head{padding-bottom:50px}.video-head p{max-width:420px;font-size:18px;line-height:1.4;opacity:.66;margin:28px 0 0}.video-strip{display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));gap:12px;padding:0 12px;overflow-x:auto}.video-card{min-height:540px;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:#151515;color:white;text-align:left;padding:24px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end}.video-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:brightness(.6) saturate(.8);transition:transform .5s,filter .5s}.video-card:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.06) 65%);z-index:1}.video-card>*:not(img){position:relative;z-index:2}.video-card:hover img{transform:scale(1.035);filter:brightness(.75) saturate(1)}.video-card .video-index{position:absolute;top:22px;left:24px;font-size:11px;opacity:.7}.video-card .play{position:absolute;top:20px;right:20px;width:46px;height:46px;border-radius:50%;background:var(--lime);color:black;display:grid;place-items:center;padding-left:3px}.video-card strong{font-size:38px;letter-spacing:-.05em;text-transform:uppercase}.video-card small{font-size:12px;text-transform:uppercase;letter-spacing:.1em;opacity:.68;margin-top:6px}
+.gallery{background:#c7c5ff}.gallery-head{display:grid;grid-template-columns:.55fr 1.45fr;margin-bottom:8vw}.gallery-head .section-label{grid-column:1/-1}.gallery-head h2{grid-column:2}.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:22vw;gap:10px}.gallery-grid figure{margin:0;border-radius:16px;overflow:hidden;background:#ddd}.gallery-grid figure.g-wide{grid-column:span 2}.gallery-grid figure.g-tall{grid-row:span 2}.gallery-grid img{width:100%;height:100%;object-fit:cover;transition:transform .5s}.gallery-grid figure:hover img{transform:scale(1.025)}
+.process-grid{display:grid;grid-template-columns:1fr 1fr;gap:8vw}.steps{border-top:1px solid var(--line)}.steps>div{display:grid;grid-template-columns:52px .8fr 1.2fr;gap:20px;padding:28px 0;border-bottom:1px solid var(--line);align-items:start}.steps span{font-size:11px;opacity:.5}.steps h3{margin:0;font-size:23px;letter-spacing:-.03em}.steps p{margin:0;line-height:1.45;opacity:.7}
+.quote-section{height:86vh;min-height:620px;position:relative;color:white;display:grid;place-items:center;overflow:hidden}.quote-section img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.45)}.quote-section:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,transparent,rgba(0,0,0,.55))}.quote-section blockquote{position:relative;z-index:2;text-align:center;font-size:clamp(40px,6.5vw,100px);line-height:.95;letter-spacing:-.055em;margin:0;width:min(1200px,90%);text-transform:uppercase;font-weight:900}.quote-section strong{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;text-transform:none;color:var(--lime)}
+.contact{background:var(--lime);min-height:86vh;display:flex;flex-direction:column;justify-content:center}.contact-kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:24px}.contact-actions{margin-top:60px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}.contact-actions>a,.contact-main{border:1px solid var(--black);border-radius:999px;padding:19px 26px;background:transparent;text-transform:uppercase;font-size:12px;letter-spacing:.08em}.contact-main{background:var(--black);color:white;cursor:pointer;min-width:280px;text-align:left;display:flex;justify-content:space-between}.contact-note{max-width:460px;line-height:1.5;margin-top:32px}
+footer{background:var(--black);color:white;padding:70px var(--pad) 38px;display:grid;grid-template-columns:1.4fr .8fr .4fr;gap:30px;align-items:end}.footer-brand{font-size:clamp(46px,6vw,92px);line-height:.78;font-weight:900;letter-spacing:-.07em}.footer-brand+div,footer>div:last-child{display:flex;flex-direction:column;gap:8px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;opacity:.72}
+.modal,.video-modal{border:0;padding:0;background:var(--paper);color:var(--black);width:min(720px,calc(100% - 24px));max-width:none;border-radius:28px;box-shadow:0 30px 100px rgba(0,0,0,.4)}.modal::backdrop,.video-modal::backdrop{background:rgba(0,0,0,.68);backdrop-filter:blur(8px)}.modal-inner{padding:clamp(30px,6vw,64px)}.modal-close{position:absolute;z-index:3;right:16px;top:16px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(0,0,0,.16);background:rgba(255,255,255,.7);cursor:pointer;font-size:28px}.modal h2{font-size:clamp(54px,8vw,98px);margin:16px 0 44px}.modal form{display:grid;gap:18px}.modal label{display:grid;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em}.modal input,.modal select{width:100%;border:0;border-bottom:1px solid var(--black);background:transparent;padding:12px 0 14px;font-size:18px;border-radius:0}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:24px}.submit{margin-top:14px;border:0;background:var(--black);color:white;border-radius:999px;padding:20px 24px;cursor:pointer;text-transform:uppercase;letter-spacing:.07em;font-size:12px;display:flex;justify-content:space-between}.form-hint{font-size:12px;line-height:1.4;opacity:.55;margin:0}.video-modal{background:#000;width:min(1180px,calc(100% - 24px));border-radius:22px;overflow:hidden}.video-modal .modal-close{color:white;border-color:rgba(255,255,255,.25);background:rgba(0,0,0,.35)}.video-frame{aspect-ratio:16/9}.video-frame iframe{width:100%;height:100%;border:0}.toast{position:fixed;z-index:150;bottom:22px;left:50%;transform:translate(-50%,20px);background:var(--black);color:white;padding:14px 18px;border-radius:999px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;opacity:0;pointer-events:none;transition:.3s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .75s ease,transform .75s ease}.reveal.in{opacity:1;transform:none}
+@media (max-width:900px){
+  .topbar{left:10px;right:10px;top:9px;height:56px;grid-template-columns:1fr auto}.nav{display:none}.pill{padding:12px 16px}.hero{min-height:760px}.hero-copy{padding-top:108px}.hero h1{font-size:clamp(64px,17vw,118px);margin-top:12vh}.hero h1 span:nth-child(2){margin-left:0}.hero-bottom{align-items:flex-end}.hero-actions{gap:12px;flex-direction:column-reverse}.round-cta{width:112px;height:112px;padding:18px}.text-link{display:none}
+  .manifest-grid,.formats-head,.process-grid{grid-template-columns:1fr}.manifest-copy{margin-top:38px}.principles{grid-template-columns:1fr}.principles article,.principles article+article{padding:24px 0;border-right:0;border-bottom:1px solid var(--line);min-height:0}.principles article:last-child{border-bottom:0}.principles h3{margin:30px 0 8px}.portrait-break{height:760px}.portrait-card.p1{width:48vw;left:4vw;height:44%;top:8%}.portrait-card.p2{width:52vw;right:3vw;height:44%;bottom:7%}.portrait-word{width:92%;z-index:3}
+  .format-title{grid-template-columns:42px 1fr 38px}.format-title .name{font-size:clamp(42px,13vw,74px)}.format-body{grid-template-columns:1fr}.format-item.is-open .format-body{max-height:1100px}.format-text{padding-left:42px}.format-body img{margin-left:42px;width:calc(100% - 42px);aspect-ratio:4/3}.video-strip{grid-template-columns:repeat(4,78vw)}.video-card{min-height:520px}.gallery-head{display:block}.gallery-head h2{margin-top:0}.gallery-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:46vw}.steps{margin-top:50px}.steps>div{grid-template-columns:40px 1fr}.steps p{grid-column:2}.quote-section{height:75vh}.contact{min-height:75vh}footer{grid-template-columns:1fr 1fr}.footer-brand{grid-column:1/-1;margin-bottom:32px}
+}
+@media (max-width:560px){
+  .hero-media img{object-position:62% 50%}.hero-shade{background:linear-gradient(0deg,rgba(0,0,0,.83),rgba(0,0,0,.08) 75%),linear-gradient(90deg,rgba(0,0,0,.42),transparent)}.hero-copy{padding-bottom:28px}.hero-bottom{gap:18px}.hero-line{font-size:36px}.round-cta{width:98px;height:98px;padding:15px}.round-cta span{font-size:10px}.round-cta b{font-size:22px}.section-pad{padding-left:18px;padding-right:18px}.manifest h2,.formats h2,.video-head h2,.gallery h2,.process h2,.contact h2{font-size:clamp(50px,17vw,88px)}.portrait-break{min-height:620px;height:680px}.portrait-card.p1{width:58vw}.portrait-card.p2{width:62vw}.portrait-word{font-size:17vw}.format-text{padding-left:0}.format-body img{margin-left:0;width:100%}.format-title{grid-template-columns:32px 1fr 28px}.gallery-grid{gap:6px}.contact-actions{display:grid;align-items:stretch}.contact-actions>a,.contact-main{width:100%;min-width:0}.form-row{grid-template-columns:1fr}.modal{border-radius:22px}.modal-inner{padding:30px 22px 24px}.modal h2{margin-bottom:28px}footer{padding-left:18px;padding-right:18px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.marquee-track{animation:none}.reveal{opacity:1;transform:none;transition:none}*{transition-duration:.01ms!important}}
+
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="topbar" id="top">
+    <a class="brand" href="#top" aria-label="На главную">СГ<span>•</span>26</a>
+    <nav class="nav" aria-label="Главное меню">
+      <a href="#formats">форматы</a>
+      <a href="#video">видео</a>
+      <a href="#gallery">галерея</a>
+    </nav>
+    <button class="pill js-open-booking" type="button">проверить дату</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <img src="https://lh3.googleusercontent.com/d/1qdBh9M3MoveJ8wVZ_1Tf1VRCEDx-7Yfk=w1600" alt="" fetchpriority="high" />
+      </div>
+      <div class="hero-shade"></div>
+      <div class="hero-copy">
+        <p class="eyebrow">ведущий / шоумен / свой человек на вашем событии</p>
+        <h1><span>Сергей</span><span>Головенькин</span></h1>
+        <div class="hero-bottom">
+          <p class="hero-line">Читаю зал,<br><strong>а не сценарий.</strong></p>
+          <div class="hero-actions">
+            <button class="round-cta js-open-booking" type="button" aria-label="Проверить свободна ли дата">
+              <span>свободна<br>ли дата?</span><b>↗</b>
+            </button>
+            <a class="text-link" href="#video">смотреть в деле ↓</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="marquee" aria-label="Форматы мероприятий">
+      <div class="marquee-track">
+        <span>свадьбы ✳ корпоративы ✳ выпускные ✳ юбилеи ✳ без неловких конкурсов ✳ живые эмоции ✳ </span>
+        <span aria-hidden="true">свадьбы ✳ корпоративы ✳ выпускные ✳ юбилеи ✳ без неловких конкурсов ✳ живые эмоции ✳ </span>
+      </div>
+    </div>
+
+    <section class="manifest section-pad">
+      <div class="section-label">01 / подход</div>
+      <div class="manifest-grid">
+        <h2>Не праздник<br><em>по методичке.</em></h2>
+        <div class="manifest-copy">
+          <p class="lead">Сначала я чувствую людей. Потом добавляю темп. Интерактив появляется тогда, когда он действительно нужен залу — а не потому, что «так написано в сценарии».</p>
+          <p>Начинаем легко, чтобы гости привыкли ко мне и друг к другу. Дальше — по нарастающей: больше энергии, больше общей игры, больше моментов, которые потом вспоминают.</p>
+        </div>
+      </div>
+      <div class="principles">
+        <article><b>01</b><h3>Без принуждения</h3><p>Никаких неловких «выйдите сюда». Вовлечение — через массовость и простые правила.</p></article>
+        <article><b>02</b><h3>В моменте</h3><p>Не цепляюсь за лист сценария. Смотрю, что происходит здесь и сейчас, и работаю с этим.</p></article>
+        <article><b>03</b><h3>Ваши пожелания — закон</h3><p>До события фиксируем важное. На площадке вы отдыхаете — дальше ход за мной.</p></article>
+      </div>
+    </section>
+
+    <section class="portrait-break">
+      <figure class="portrait-card p1"><img src="https://lh3.googleusercontent.com/d/1jTqHMPZdhhx8yDNrRY_mDBSsDNFCxJ10=w1200" alt="Сергей Головенькин ведет мероприятие" loading="lazy" /></figure>
+      <p class="portrait-word">не&nbsp;наблюдать.<br><strong>участвовать.</strong></p>
+      <figure class="portrait-card p2"><img src="https://lh3.googleusercontent.com/d/1CmO5mBe_OW22bJYfaHC8ODH1UF-ELPSy=w1200" alt="Сергей Головенькин на мероприятии" loading="lazy" /></figure>
+    </section>
+
+    <section class="formats section-pad" id="formats">
+      <div class="section-label">02 / выбирайте событие</div>
+      <div class="formats-head">
+        <h2>Четыре формата.<br>Один принцип — <em>живой зал.</em></h2>
+        <p>Нажмите на событие — расскажу, как я его веду.</p>
+      </div>
+
+      <div class="format-list">
+        <article class="format-item is-open">
+          <button class="format-title" type="button" aria-expanded="true">
+            <span class="num">01</span><span class="name">Свадьба</span><span class="arrow">↘</span>
+          </button>
+          <div class="format-body">
+            <div class="format-text">
+              <p class="big">Свадьба начинается не с конкурса. Она начинается с ощущения, что сегодня всё — про вас.</p>
+              <p>До даты разбираем ключевые моменты, музыку, людей и идеи для сюрпризов. На самой свадьбе я не работаю по жёсткому сценарию: сначала легко знакомлюсь с залом, а затем наращиваю интенсивность и выбираю интерактивы по реакции гостей.</p>
+              <ul><li>подготовка вместе с парой</li><li>работа в связке с DJ</li><li>интерактивы без давления</li></ul>
+            </div>
+            <img src="https://lh3.googleusercontent.com/d/1kjjeunNkVWesHK4CP5UM0NomDEFCLTtu=w1400" alt="Сергей на свадьбе" loading="lazy" />
+          </div>
+        </article>
+
+        <article class="format-item">
+          <button class="format-title" type="button" aria-expanded="false">
+            <span class="num">02</span><span class="name">Корпоратив</span><span class="arrow">↘</span>
+          </button>
+          <div class="format-body">
+            <div class="format-text">
+              <p class="big">Разный возраст, должности и характеры. Моя задача — сделать так, чтобы в один вечер это стало одной компанией.</p>
+              <p>Без точечных конкурсов «для смелых». Люблю массовые механики, где можно проявиться каждому — независимо от статуса. Сохраняем повод, характер компании и пожелания заказчика, но даём людям по-настоящему выдохнуть.</p>
+              <ul><li>вовлечение разных поколений</li><li>массовые интерактивы</li><li>акцент на повод и команду</li></ul>
+            </div>
+            <img src="https://lh3.googleusercontent.com/d/1aMpFvHAQyWI7aXxfI-8cm5jpRi9rwgmV=w1200" alt="Корпоратив с Сергеем" loading="lazy" />
+          </div>
+        </article>
+
+        <article class="format-item">
+          <button class="format-title" type="button" aria-expanded="false">
+            <span class="num">03</span><span class="name">Выпускной</span><span class="arrow">↘</span>
+          </button>
+          <div class="format-body">
+            <div class="format-text">
+              <p class="big">70% внимания — выпускникам. Потому что это их вечер. Школа закончилась, дальше можно уходить в отрыв.</p>
+              <p>Слежу за трендами и не пытаюсь развлекать ребят форматами из прошлого. Батлы, караоке, битвы поколений, массовые интерактивы — легко, быстро, без долгих правил. Родителей не забываем: они часть праздника и заказчики.</p>
+              <ul><li>актуальные механики</li><li>батлы и караоке</li><li>выпускники + родители</li></ul>
+            </div>
+            <img src="https://lh3.googleusercontent.com/d/1PJKkSFK1Q0y9sBQjmQZtOTc7jSeIvK_N=w1200" alt="Сергей с выпускниками" loading="lazy" />
+          </div>
+        </article>
+
+        <article class="format-item">
+          <button class="format-title" type="button" aria-expanded="false">
+            <span class="num">04</span><span class="name">Юбилей</span><span class="arrow">↘</span>
+          </button>
+          <div class="format-body">
+            <div class="format-text">
+              <p class="big">Тепло, близко и без ощущения «официального юбилея». Именинник должен чувствовать себя моложе, а не торжественнее.</p>
+              <p>Обсуждаем критерии и важные детали, при необходимости подсказываю по площадке и формату. Минимум организационных заморочек для заказчика: конкретные вопросы, конкретные ответы — и дальше я собираю вечер.</p>
+              <ul><li>индивидуальная подача</li><li>уют + драйв</li><li>минимум забот заказчику</li></ul>
+            </div>
+            <img src="https://lh3.googleusercontent.com/d/1m-ZG9BMCdx96AQETn6jffc6UNxHXpy4v=w1200" alt="Сергей ведет юбилей" loading="lazy" />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="video-section" id="video">
+      <div class="section-pad video-head">
+        <div class="section-label light">03 / в деле</div>
+        <h2>Лучше один раз<br><em>увидеть.</em></h2>
+        <p>Не постановочные обещания — живые фрагменты мероприятий с телефона.</p>
+      </div>
+      <div class="video-strip">
+        <button class="video-card js-video" data-video="1hNKmrGICca3hLyhjFNfBPziVepZmuTjq" type="button">
+          <span class="video-index">01</span><span class="play">▶</span><strong>Свадьба</strong><small>эмоции / гости / танцпол</small>
+          <img src="https://lh3.googleusercontent.com/d/1nQqgYjrw_BxIo7Ppwv5ynOKPwt0cov70=w1000" alt="" loading="lazy" />
+        </button>
+        <button class="video-card js-video" data-video="1H_ojl31s6Q3E5dnBUyXQPAVbXu-PAB60" type="button">
+          <span class="video-index">02</span><span class="play">▶</span><strong>Корпоратив</strong><small>темп / массовость / контакт</small>
+          <img src="https://lh3.googleusercontent.com/d/1Acfv3kTZ73Waqn9_kOLYZG7_jk-qtgXJ=w1000" alt="" loading="lazy" />
+        </button>
+        <button class="video-card js-video" data-video="1ZNphmiLEUXibWsPmk1ZTb5HNRF1FpXl8" type="button">
+          <span class="video-index">03</span><span class="play">▶</span><strong>Выпускной</strong><small>свои / громко / вместе</small>
+          <img src="https://lh3.googleusercontent.com/d/1PJKkSFK1Q0y9sBQjmQZtOTc7jSeIvK_N=w1000" alt="" loading="lazy" />
+        </button>
+        <button class="video-card js-video" data-video="1cAcY9RI2lCa7kG011K0Q28N4f_hdaqCX" type="button">
+          <span class="video-index">04</span><span class="play">▶</span><strong>Вечеринка</strong><small>свет / шоу / финал</small>
+          <img src="https://lh3.googleusercontent.com/d/1Gdvjl3vcq6mQD30QWJF5t3-EIHLCdMIj=w1000" alt="" loading="lazy" />
+        </button>
+      </div>
+    </section>
+
+    <section class="gallery section-pad" id="gallery">
+      <div class="gallery-head">
+        <div class="section-label">04 / без фильтра</div>
+        <h2>Вечера,<br>где было <em>не скучно.</em></h2>
+      </div>
+      <div class="gallery-grid">
+        <figure class="g-wide"><img src="https://lh3.googleusercontent.com/d/1t2knRpSt8g7wZxVHEX5h9upVb0ZkHSyA=w1600" alt="Свадебный вечер" loading="lazy"></figure>
+        <figure class="g-tall"><img src="https://lh3.googleusercontent.com/d/1jTqHMPZdhhx8yDNrRY_mDBSsDNFCxJ10=w1200" alt="Портрет Сергея" loading="lazy"></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1BtuqpBpSkdVBWDPfTG6FIh2mwGkkUNuC=w1200" alt="Интерактив на свадьбе" loading="lazy"></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1Fxqdu1iXDOb9d6v0KPK6uQwSMjgP6Jq8=w1200" alt="Гости мероприятия" loading="lazy"></figure>
+        <figure class="g-wide"><img src="https://lh3.googleusercontent.com/d/1kjjeunNkVWesHK4CP5UM0NomDEFCLTtu=w1600" alt="Сергей с молодоженами" loading="lazy"></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1rz9GAjdiBMch6dtq5s1W4Lkklf466DAa=w1200" alt="Сергей в работе" loading="lazy"></figure>
+        <figure><img src="https://lh3.googleusercontent.com/d/1UNvQ2c7l2PKJsHmhG93Vpz0JNQovf_9r=w1200" alt="Сергей на празднике" loading="lazy"></figure>
+        <figure class="g-wide"><img src="https://lh3.googleusercontent.com/d/1DNLvBqGAwSk1qpSmLx3SYmJpbC8qNt8y=w1600" alt="Сергей на сцене" loading="lazy"></figure>
+      </div>
+    </section>
+
+    <section class="process section-pad">
+      <div class="section-label">05 / без лишней суеты</div>
+      <div class="process-grid">
+        <h2>Вы отдыхаете.<br><em>Я держу вечер.</em></h2>
+        <div class="steps">
+          <div><span>01</span><h3>Знакомимся</h3><p>Дата, формат, люди, что нравится и что точно не хочется видеть.</p></div>
+          <div><span>02</span><h3>Собираем основу</h3><p>Ключевые моменты, музыка, особенности гостей, ваши идеи и сюрпризы.</p></div>
+          <div><span>03</span><h3>Чувствую площадку</h3><p>Начинаю спокойно, считываю зал и выбираю правильную скорость вечера.</p></div>
+          <div><span>04</span><h3>Уходим в отрыв</h3><p>Когда гости готовы — добавляем интенсивность. Без насилия над людьми и таймингом.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section">
+      <img src="https://lh3.googleusercontent.com/d/1yoYNIG2stggOU70GxmKV4oefjjZ6ruWO=w1600" alt="Сергей Головенькин на мероприятии" loading="lazy" />
+      <blockquote>«Праздник — это место, где возможно почти всё.<br><strong>В пределах разумного, конечно.»</strong></blockquote>
+    </section>
+
+    <section class="contact section-pad" id="contact">
+      <p class="contact-kicker">есть дата?</p>
+      <h2>Проверим,<br><em>свободна ли.</em></h2>
+      <div class="contact-actions">
+        <button class="contact-main js-open-booking" type="button">обсудить событие <span>↗</span></button>
+        <a href="tel:+79222271107">+7 922 227-11-07</a>
+        <a href="https://vk.me/sergey.alexandrovich85" target="_blank" rel="noopener">написать в VK ↗</a>
+      </div>
+      <p class="contact-note">Свадьба / корпоратив / выпускной / юбилей — напишите дату и город. Остальное разберём вместе.</p>
+    </section>
+  </main>
+
+  <footer>
+    <a href="#top" class="footer-brand">СЕРГЕЙ<br>ГОЛОВЕНЬКИН.</a>
+    <div><span>ведущий мероприятий</span><span>© 2026</span></div>
+    <div><a href="tel:+79222271107">позвонить</a><a href="https://vk.com/sergey.alexandrovich85" target="_blank" rel="noopener">VK</a></div>
+  </footer>
+
+  <dialog class="modal" id="bookingModal">
+    <button class="modal-close" type="button" aria-label="Закрыть">×</button>
+    <div class="modal-inner">
+      <p class="eyebrow">проверка даты / 1 минута</p>
+      <h2>Что за<br><em>движ?</em></h2>
+      <form id="bookingForm">
+        <label>Событие
+          <select name="event" required>
+            <option value="Свадьба">Свадьба</option>
+            <option value="Корпоратив">Корпоратив</option>
+            <option value="Выпускной">Выпускной</option>
+            <option value="Юбилей">Юбилей</option>
+            <option value="Другое событие">Другое событие</option>
+          </select>
+        </label>
+        <div class="form-row">
+          <label>Дата<input type="date" name="date" required></label>
+          <label>Город<input type="text" name="city" placeholder="например, Екатеринбург" required></label>
+        </div>
+        <label>Ваше имя<input type="text" name="name" placeholder="Как к вам обращаться?" required></label>
+        <button class="submit" type="submit">скопировать запрос и открыть VK <span>↗</span></button>
+        <p class="form-hint">Сайт соберёт короткое сообщение, скопирует его и откроет диалог с Сергеем во ВКонтакте.</p>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog class="video-modal" id="videoModal">
+    <button class="modal-close" type="button" aria-label="Закрыть">×</button>
+    <div class="video-frame" id="videoFrame"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Запрос скопирован ✓</div>
+
+  <script>
+const $ = (s, root = document) => root.querySelector(s);
+const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+
+// Accordions
+$$('.format-title').forEach((button) => {
+  button.addEventListener('click', () => {
+    const item = button.closest('.format-item');
+    const open = item.classList.contains('is-open');
+    $$('.format-item').forEach((el) => {
+      el.classList.remove('is-open');
+      $('.format-title', el).setAttribute('aria-expanded', 'false');
+    });
+    if (!open) {
+      item.classList.add('is-open');
+      button.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+// Subtle reveal animation
+const revealTargets = $$('.manifest-grid, .principles, .formats-head, .format-item, .gallery-head, .gallery-grid, .process-grid, .contact > *');
+revealTargets.forEach((el) => el.classList.add('reveal'));
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.09, rootMargin: '0px 0px -50px' });
+revealTargets.forEach((el) => observer.observe(el));
+
+// Booking dialog
+const bookingModal = $('#bookingModal');
+$$('.js-open-booking').forEach((button) => button.addEventListener('click', () => bookingModal.showModal()));
+$('.modal-close', bookingModal).addEventListener('click', () => bookingModal.close());
+bookingModal.addEventListener('click', (e) => {
+  if (e.target === bookingModal) bookingModal.close();
+});
+
+const toast = $('#toast');
+const showToast = (text = 'Запрос скопирован ✓') => {
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+};
+
+$('#bookingForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = new FormData(e.currentTarget);
+  const rawDate = data.get('date');
+  const date = rawDate ? new Date(`${rawDate}T12:00:00`).toLocaleDateString('ru-RU') : 'дата уточняется';
+  const message = `Сергей, здравствуйте! Меня зовут ${data.get('name')}. Интересует ${String(data.get('event')).toLowerCase()} ${date}, город — ${data.get('city')}. Подскажите, свободна ли дата?`;
+  try {
+    await navigator.clipboard.writeText(message);
+    showToast();
+  } catch (err) {
+    showToast('Открою диалог в VK ↗');
+  }
+  setTimeout(() => window.open('https://vk.me/sergey.alexandrovich85', '_blank', 'noopener'), 250);
+  bookingModal.close();
+});
+
+// Video modal via Google Drive preview
+const videoModal = $('#videoModal');
+const videoFrame = $('#videoFrame');
+$$('.js-video').forEach((card) => {
+  card.addEventListener('click', () => {
+    const id = card.dataset.video;
+    videoFrame.innerHTML = `<iframe src="https://drive.google.com/file/d/${id}/preview" allow="autoplay; fullscreen" allowfullscreen title="Видео с мероприятия"></iframe>`;
+    videoModal.showModal();
+  });
+});
+$('.modal-close', videoModal).addEventListener('click', () => videoModal.close());
+videoModal.addEventListener('close', () => { videoFrame.innerHTML = ''; });
+videoModal.addEventListener('click', (e) => { if (e.target === videoModal) videoModal.close(); });
+
+// Header behavior
+let lastY = window.scrollY;
+const topbar = $('.topbar');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  topbar.style.transform = y > lastY && y > 180 ? 'translateY(-88px)' : 'translateY(0)';
+  topbar.style.transition = 'transform .35s ease';
+  lastY = y;
+}, { passive: true });
+
+// Resilient Google Drive image fallback.
+document.querySelectorAll('img[src*="lh3.googleusercontent.com/d/"]').forEach((img) => {
+  img.addEventListener('error', () => {
+    if (img.dataset.fallbackTried) return;
+    img.dataset.fallbackTried = '1';
+    const match = img.src.match(/\/d\/([^=/?]+)/);
+    if (match) img.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+  });
+});
+
+  </script>
+</body>
+</html>
