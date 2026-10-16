@@ -332,14 +332,14 @@ function form(){
         toast('Заявка отправлена ✓');
         if(!reduced)gsap.from(success.children,{y:30,opacity:0,stagger:.07});
       }else if(j.needsConfig){
-        status.textContent='Канал приёма ещё не подключён. Текст заявки скопирован — открою VK.';
+        status.textContent='Автоматический приём заявок пока не настроен. Текст подготовлен для отправки через VK.';
         status.classList.add('is-error');
         await vkFallback(d);
       }else{
         throw Error(j.message||'Ошибка');
       }
     }catch{
-      status.textContent='Автоотправка сейчас недоступна. Текст заявки подготовлен для VK.';
+      status.textContent='Не удалось отправить заявку автоматически. Текст подготовлен для отправки через VK.';
       status.classList.add('is-error');
       await vkFallback(d);
     }finally{
