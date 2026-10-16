@@ -48,6 +48,43 @@ function splitWords(root){
   return words;
 }
 
+let metrikaCounterId = 0;
+
+function initAnalytics(){
+  const configuredId = Number(import.meta.env.VITE_YANDEX_METRIKA_ID || 0);
+  if(!Number.isSafeInteger(configuredId) || configuredId <= 0)return;
+
+  metrikaCounterId = configuredId;
+  window.ym = window.ym || function(){(window.ym.a = window.ym.a || []).push(arguments)};
+  window.ym.l = window.ym.l || Date.now();
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://mc.yandex.ru/metrika/tag.js';
+  document.head.append(script);
+
+  window.ym(metrikaCounterId, 'init', {
+    clickmap: true,
+    trackLinks: true,
+    accurateTrackBounce: true,
+    webvisor: false
+  });
+}
+
+function trackGoal(goal, params){
+  if(!metrikaCounterId || typeof window.ym !== 'function')return;
+  window.ym(metrikaCounterId, 'reachGoal', goal, params);
+}
+
+function analyticsClicks(){
+  $$('a[href^="tel:"]').forEach(link => {
+    link.addEventListener('click', () => trackGoal('click_phone'));
+  });
+  $$('a[href*="vk.me"],a[href*="vk.com/sergey.alexandrovich85"]').forEach(link => {
+    link.addEventListener('click', () => trackGoal('click_vk'));
+  });
+}
+
 function toast(t){
   const el=$('#toast');
   if(!el)return;
@@ -288,6 +325,7 @@ function leadText(d){
 }
 
 async function vkFallback(d){
+  trackGoal('vk_fallback_open');
   try{
     await navigator.clipboard.writeText(leadText(d));
     toast('Заявка скопирована — открываю VK');
@@ -326,6 +364,7 @@ function form(){
       const j=await r.json().catch(()=>({}));
 
       if(r.ok&&j.ok){
+        trackGoal('lead_submit_success', {event:d.event});
         form.hidden=true;
         success.hidden=false;
         form.reset();
@@ -398,6 +437,8 @@ function anchors(){
 }
 
 async function init(){
+  initAnalytics();
+  analyticsClicks();
   fallbackImages();
   nav();
   cursor();
