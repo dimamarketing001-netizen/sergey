@@ -19,7 +19,7 @@ app.use(express.json({limit:'32kb'}));
 const limiter=rateLimit({windowMs:15*60*1000,limit:12,standardHeaders:true,legacyHeaders:false});
 const clean=(v,max=500)=>String(v??'').trim().slice(0,max);
 function buildLead(body){return{event:clean(body.event,60),date:clean(body.date,30),city:clean(body.city,100),name:clean(body.name,100),phone:clean(body.phone,50),guests:clean(body.guests,20),contactMethod:clean(body.contactMethod,40),comment:clean(body.comment,900),page:clean(body.page,300),website:clean(body.website,120)}}
-function message(l){return['🔥 Новая заявка с сайта Сергея Головенькина','',`Событие: ${l.event||'—'}`,`Дата: ${l.date||'—'}`,`Город: ${l.city||'—'}`,`Имя: ${l.name||'—'}`,`Телефон: ${l.phone||'—'}`,`Гостей: ${l.guests||'—'}`,`Удобный канал: ${l.contactMethod||'—'}`,`Комментарий: ${l.comment||'—'}`,'',`Страница: ${l.page||'—'}`].join('\n')}
+function message(l){return['🔥 Новая заявка с сайта Сергея Александровича','',`Событие: ${l.event||'—'}`,`Дата: ${l.date||'—'}`,`Город: ${l.city||'—'}`,`Имя: ${l.name||'—'}`,`Телефон: ${l.phone||'—'}`,`Гостей: ${l.guests||'—'}`,`Удобный канал: ${l.contactMethod||'—'}`,`Комментарий: ${l.comment||'—'}`,'',`Страница: ${l.page||'—'}`].join('\n')}
 async function telegram(l){const token=process.env.TELEGRAM_BOT_TOKEN,chatId=process.env.TELEGRAM_CHAT_ID;if(!token||!chatId)return false;const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:message(l),disable_web_page_preview:true})});if(!r.ok)throw new Error(`Telegram ${r.status}`);return true}
 async function vk(l){
   const token=process.env.VK_ACCESS_TOKEN;
