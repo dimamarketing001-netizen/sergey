@@ -77,10 +77,10 @@ function trackGoal(goal, params){
 }
 
 function analyticsClicks(){
-  $('a[href^="tel:"]').forEach(link => {
+  $$('a[href^="tel:"]').forEach(link => {
     link.addEventListener('click', () => trackGoal('click_phone'));
   });
-  $('a[href*="vk.me"],a[href*="vk.com/sergey.alexandrovich85"]').forEach(link => {
+  $$('a[href*="vk.me"],a[href*="vk.com/sergey.alexandrovich85"]').forEach(link => {
     link.addEventListener('click', () => trackGoal('click_vk'));
   });
 }
