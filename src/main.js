@@ -24,6 +24,50 @@ function splitLetters(el, cls='split-char'){
   return out;
 }
 
+const OUTLINE_FONT="300 100px Montserrat";
+let outlineCtx;
+
+/* Контурные буквы: каждая буква — отдельный inline-SVG с <text>.
+   Шрифт Montserrat Light подключён без перекрывающихся контуров,
+   поэтому обводка получается ровной и без внутренних линий (особенно в «А», «К», «Д»).
+   Размеры в em — контур масштабируется вместе с font-size. */
+function outlineLetters(el, cls='split-char'){
+  if(!el||el.dataset.ready)return[];
+  el.dataset.ready='1';
+  const text=el.textContent.trim();
+  el.setAttribute('aria-label',text);
+  outlineCtx=outlineCtx||document.createElement('canvas').getContext('2d');
+  outlineCtx.font=OUTLINE_FONT;
+  const ns='http://www.w3.org/2000/svg',pad=.06,asc=1.02,desc=.28,gap=.035;
+  let total=0;
+  const out=[...text].map(ch=>{
+    const adv=outlineCtx.measureText(ch).width/100;
+    const w=adv+pad*2;
+    total+=w+gap-pad*2;
+    const svg=document.createElementNS(ns,'svg');
+    svg.setAttribute('class',cls+' outline-char');
+    svg.setAttribute('aria-hidden','true');
+    svg.setAttribute('focusable','false');
+    svg.style.width=w+'em';
+    svg.style.height=(asc+desc)+'em';
+    svg.style.marginInline=(-pad)+'em '+(gap-pad)+'em';
+    if(ch.trim()){
+      const t=document.createElementNS(ns,'text');
+      t.setAttribute('x',pad+'em');
+      t.setAttribute('y',asc+'em');
+      t.textContent=ch;
+      svg.append(t);
+    }
+    return svg;
+  });
+  el.replaceChildren(...out);
+  el.classList.add('is-outlined');
+  el.style.setProperty('--word-em',total.toFixed(3));
+  return out;
+}
+
+const splitAny=(el,cls)=>el.hasAttribute('data-outline')?outlineLetters(el,cls):splitLetters(el,cls);
+
 function splitWords(root){
   if(!root||root.dataset.wordsReady)return[];
   root.dataset.wordsReady='1';
@@ -94,15 +138,6 @@ function toast(t){
   toast.t=setTimeout(()=>el.classList.remove('is-visible'),2600);
 }
 
-function fallbackImages(){
-  $$('img[src*="lh3.googleusercontent.com/d/"]').forEach(img=>img.addEventListener('error',()=>{
-    if(img.dataset.fb)return;
-    img.dataset.fb=1;
-    const m=img.src.match(/\/d\/([^=/?]+)/);
-    if(m)img.src=`https://drive.google.com/thumbnail?id=${m[1]}&sz=w1800`;
-  }));
-}
-
 function preloader(){
   const p=$('.preloader');
   if(!p)return Promise.resolve();
@@ -163,7 +198,7 @@ function nav(){
 }
 
 function hero(){
-  const chars=$$('.hero__line').flatMap(splitLetters);
+  const chars=$$('.hero__line').flatMap(el=>splitAny(el));
   if(reduced)return;
   gsap.timeline()
     .from(chars,{yPercent:120,opacity:0,duration:.9,stagger:.016,ease:'power4.out'})
@@ -300,13 +335,26 @@ function gallery(){
 function videos(){
   const m=$('#videoModal');
   const f=$('#videoFrame');
+  const stop=()=>{
+    const v=$('video',f);
+    if(v)v.pause();
+    f.replaceChildren();
+  };
   $$('.js-video').forEach(c=>c.addEventListener('click',()=>{
-    f.innerHTML=`<iframe src="https://drive.google.com/file/d/${c.dataset.video}/preview" allow="autoplay; fullscreen" allowfullscreen title="Видео с мероприятия"></iframe>`;
+    const v=document.createElement('video');
+    v.src=`/video/${c.dataset.video}.mp4`;
+    v.controls=true;
+    v.autoplay=true;
+    v.playsInline=true;
+    v.preload='metadata';
+    v.setAttribute('aria-label','Видео с мероприятия');
+    f.replaceChildren(v);
     m.showModal();
+    v.play().catch(()=>{});
   }));
   $('.video-modal__close',m)?.addEventListener('click',()=>m.close());
   m.addEventListener('click',e=>{if(e.target===m)m.close()});
-  m.addEventListener('close',()=>f.innerHTML='');
+  m.addEventListener('close',stop);
 }
 
 function leadText(d){
@@ -395,7 +443,7 @@ function form(){
 
 function footer(){
   const chars=[];
-  $$('[data-footer-name]').forEach(x=>chars.push(...splitLetters(x,'footer-char')));
+  $$('[data-footer-name]').forEach(x=>chars.push(...splitAny(x,'footer-char')));
 
   if(!reduced){
     gsap.from(chars,{
@@ -439,7 +487,6 @@ function anchors(){
 async function init(){
   initAnalytics();
   analyticsClicks();
-  fallbackImages();
   nav();
   cursor();
   magnetic();
@@ -448,7 +495,11 @@ async function init(){
   form();
   anchors();
 
-  await preloader();
+  const fonts=Promise.race([
+    Promise.all([document.fonts.load(OUTLINE_FONT,'А'),document.fonts.load('800 100px Manrope','Й')]),
+    new Promise(r=>setTimeout(r,2500))
+  ]).catch(()=>{});
+  await Promise.all([preloader(),fonts]);
 
   hero();
   reveals();
