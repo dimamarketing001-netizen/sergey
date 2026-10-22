@@ -211,37 +211,155 @@ function tilt(){
   });
 }
 
-/* ---------- Звук (по умолчанию выключен) ---------- */
+/* ---------- Звук (по умолчанию включён, стартует с первого жеста) ---------- */
 const sound=(()=>{
-  let ctx=null,on=false;
-  try{on=localStorage.getItem('sound')==='1'}catch{}
-  const btn=()=>$('[data-sound]');
-  const paint=()=>{const b=btn();if(!b)return;b.setAttribute('aria-pressed',String(on));b.textContent=`звук: ${on?'вкл':'выкл'}`};
+  let ctx=null,on=true,master=null,pad=null,unlocked=false;
+  try{on=localStorage.getItem('sound')!=='0'}catch{}
+  const btns=()=>$$('[data-sound]');
+  const paint=()=>btns().forEach(b=>{
+    b.setAttribute('aria-pressed',String(on));
+    b.classList.toggle('is-on',on);
+    if(b.classList.contains('sound-fab'))b.setAttribute('aria-label',on?'Выключить звук':'Включить звук');
+    else b.textContent=`звук: ${on?'вкл':'выкл'}`;
+  });
+  const ensure=()=>{
+    if(!ctx){
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain();master.gain.value=on?1:0;master.connect(ctx.destination);
+    }
+    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    return ctx;
+  };
+  /* мягкий «воздух»: три расстроенных синуса через фильтр + медленный LFO */
+  const startPad=()=>{
+    if(pad||!ctx)return;
+    const out=ctx.createGain();out.gain.value=0;
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;lp.Q.value=.7;
+    const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=.07;lg.gain.value=220;
+    lfo.connect(lg).connect(lp.frequency);lfo.start();
+    [110,164.81,220.5,277.2].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type=i%2?'triangle':'sine';o.frequency.value=f;o.detune.value=(i-1.5)*7;g.gain.value=.5/(i+1.4);
+      o.connect(g).connect(lp);o.start();
+    });
+    lp.connect(out).connect(master);
+    out.gain.linearRampToValueAtTime(.05,ctx.currentTime+0.01);
+    out.gain.setTargetAtTime(.05,ctx.currentTime,3);
+    pad=out;
+  };
+  const unlock=()=>{
+    if(unlocked)return;unlocked=true;
+    ['pointerdown','touchend','keydown','click'].forEach(e=>window.removeEventListener(e,unlock,true));
+    if(!on)return;
+    try{ensure();startPad()}catch{}
+  };
   return{
+    get on(){return on},
     init(){
       paint();
-      btn()?.addEventListener('click',()=>{
+      ['pointerdown','touchend','keydown','click'].forEach(e=>window.addEventListener(e,unlock,{capture:true,passive:true}));
+      btns().forEach(b=>b.addEventListener('click',e=>{
+        e.stopPropagation();
         on=!on;
         try{localStorage.setItem('sound',on?'1':'0')}catch{}
         paint();
-        if(on)this.tick(760);
-      });
+        try{
+          ensure();startPad();
+          master.gain.setTargetAtTime(on?1:0,ctx.currentTime,.12);
+          unlocked=true;
+          if(on)this.tick(760);
+        }catch{}
+      }));
     },
-    tick(freq=520){
-      if(!on)return;
+    tick(freq=520,vol=.05,len=.14){
+      if(!on||!ctx||!unlocked)return;
       try{
-        ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
-        const o=ctx.createOscillator(),g=ctx.createGain();
+        const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;
         o.type='sine';o.frequency.value=freq;
-        g.gain.setValueAtTime(.0001,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(.05,ctx.currentTime+.01);
-        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.14);
-        o.connect(g).connect(ctx.destination);
-        o.start();o.stop(ctx.currentTime+.16);
+        g.gain.setValueAtTime(.0001,t);
+        g.gain.exponentialRampToValueAtTime(vol,t+.01);
+        g.gain.exponentialRampToValueAtTime(.0001,t+len);
+        o.connect(g).connect(master);
+        o.start(t);o.stop(t+len+.02);
       }catch{}
     }
   };
 })();
+
+/* ---------- Фоновая анимация на canvas: светящиеся частицы-«искры» ---------- */
+function backdrop(host,{count=110,hue='#dfff38',link=120}={}){
+  if(!host||reduced)return;
+  const cv=document.createElement('canvas');
+  cv.className='fx-canvas';cv.setAttribute('aria-hidden','true');
+  host.prepend(cv);
+  const c=cv.getContext('2d');
+  let w=0,h=0,dpr=1,vis=false,raf=0,last=0;
+  const mouse={x:-9999,y:-9999,on:false};
+  let boost=0,lastY=window.scrollY;
+  const small=innerWidth<700;
+  const n=small?Math.round(count*.5):count;
+  const P=[];
+  const size=()=>{
+    const r=host.getBoundingClientRect();
+    dpr=Math.min(devicePixelRatio||1,2);
+    w=r.width;h=r.height;cv.width=w*dpr;cv.height=h*dpr;c.setTransform(dpr,0,0,dpr,0,0);
+  };
+  const seed=()=>{
+    P.length=0;
+    for(let i=0;i<n;i++)P.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.7+.6,a:Math.random()*6.28,p:Math.random()*6.28});
+  };
+  size();seed();
+  new ResizeObserver(()=>{size();seed()}).observe(host);
+  host.addEventListener('pointermove',e=>{const r=host.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;mouse.on=true},{passive:true});
+  host.addEventListener('pointerleave',()=>{mouse.on=false;mouse.x=mouse.y=-9999});
+  const frame=t=>{
+    raf=requestAnimationFrame(frame);
+    const dt=Math.min((t-last)/16.7||1,3);last=t;
+    const sy=window.scrollY;boost=boost*.92+Math.min(Math.abs(sy-lastY)*.02,2.5);lastY=sy;
+    c.clearRect(0,0,w,h);
+    const L=link*(small?.8:1);
+    for(const p of P){
+      /* медленное «течение» по полю углов */
+      p.a+=(Math.sin(p.x*.004+t*.0003)+Math.cos(p.y*.005-t*.00025))*.02*dt;
+      p.vx+=Math.cos(p.a)*.012*dt;p.vy+=Math.sin(p.a)*.012*dt-.002*dt;
+      if(mouse.on){
+        const dx=p.x-mouse.x,dy=p.y-mouse.y,d2=dx*dx+dy*dy;
+        if(d2<24000){const d=Math.sqrt(d2)||1,f=(1-d/155)*1.1;p.vx+=dx/d*f*dt;p.vy+=dy/d*f*dt}
+      }
+      p.vx*=.965;p.vy*=.965;
+      const k=1+boost;
+      p.x+=p.vx*dt*k;p.y+=p.vy*dt*k;
+      if(p.x<-10)p.x=w+10;else if(p.x>w+10)p.x=-10;
+      if(p.y<-10)p.y=h+10;else if(p.y>h+10)p.y=-10;
+    }
+    c.lineWidth=1;
+    for(let i=0;i<n;i++){
+      const p=P[i];
+      for(let j=i+1;j<n;j++){
+        const q=P[j],dx=p.x-q.x,dy=p.y-q.y;
+        if(dx>L||dx<-L||dy>L||dy<-L)continue;
+        const d=Math.hypot(dx,dy);
+        if(d<L){c.globalAlpha=(1-d/L)*.28;c.strokeStyle=hue;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(q.x,q.y);c.stroke()}
+      }
+    }
+    for(const p of P){
+      const tw=.55+.45*Math.sin(t*.002+p.p);
+      c.globalAlpha=.35+.55*tw;c.fillStyle=hue;
+      c.shadowColor=hue;c.shadowBlur=10;
+      c.beginPath();c.arc(p.x,p.y,p.r,0,6.283);c.fill();
+    }
+    c.shadowBlur=0;c.globalAlpha=1;
+  };
+  const run=()=>{if(vis&&!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}else if((!vis||document.hidden)&&raf){cancelAnimationFrame(raf);raf=0}};
+  new IntersectionObserver(([e])=>{vis=e.isIntersecting;run()},{rootMargin:'80px'}).observe(host);
+  document.addEventListener('visibilitychange',run);
+}
+
+function hoverSound(){
+  if(!finePointer)return;
+  $$('.btn,.nav a,.nav-cta,.format-row__head,.footer a,.quick-contact__btn').forEach(el=>
+    el.addEventListener('pointerenter',()=>sound.tick(920,.018,.08)));
+}
 
 /* ---------- Плавный скролл ---------- */
 function smoothScroll(){
@@ -712,7 +830,10 @@ async function init(){
   renderReviews(content.reviews);
   dateGuard(content.busyDates);
   smoothScroll();
+  backdrop($('.hero'),{count:120});
+  backdrop($('.footer'),{count:80,hue:'#c8c6ff'});
   tilt();
+  hoverSound();
   reelPreviews();
 
   hero();
