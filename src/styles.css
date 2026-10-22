@@ -84,12 +84,6 @@ html,body{width:100%;max-width:100%;overflow-x:clip}main,header,footer,section,.
 
 /* ================= Новые блоки ================= */
 
-/* Цифры */
-.stats{background:var(--ink);color:#fff;padding-block:clamp(56px,7vw,110px)}
-.stats__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:clamp(20px,3vw,48px)}
-.stats__item{border-top:1px solid rgba(255,255,255,.24);padding-top:18px}
-.stats__item b{display:block;font-size:clamp(54px,8vw,128px);line-height:.9;letter-spacing:-.05em;font-weight:800;color:var(--acid)}
-.stats__item span{display:block;margin-top:12px;text-transform:uppercase;font-size:11px;letter-spacing:.14em;opacity:.7}
 
 /* Бегущая строка площадок */
 .ticker--dark{background:var(--ink);color:#fff;border-color:rgba(255,255,255,.2)}
@@ -169,3 +163,33 @@ html,body{width:100%;max-width:100%;overflow-x:clip}main,header,footer,section,.
 .lead-submit b .ico{width:1em;height:1em}
 .lead__contacts .ico{width:1.1em;height:1.1em;vertical-align:-.2em}
 .reel-card__play{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center}.reel-card__play .ico{width:1.7em;height:1.7em}
+
+.formats,.formats *{overflow-anchor:none}
+
+/* Читаемость на телефоне: минимальный размер подписей 11px и более плотный контраст */
+@media all{
+  .hero__meta,.section-kicker,.fact-card span,.format-row__index,.tags span,.field>span,.field legend,.lead__contacts a,.reel-card small,.reel-card__num,.footer__top>div,.footer__bottom,.nav-cta,.toast,.preloader__top,.preloader__bottom,.lead-success button,.event-chips span,.signature-orbit__ring,.promise__small,.hero__sticker,.footer__orb,.review figcaption small,.reviews__tabs button,.reviews__more,.quick-contact__btn,.date-hint{font-size:11px}
+  .hero__meta{opacity:.9}
+  .section-kicker{opacity:.78}
+  .fact-card span{opacity:.85}
+  .reel-card small,.reel-card__num{opacity:.85}
+  .footer__top>div,.footer__bottom{opacity:.85}
+  .format-row__index{opacity:.7}
+  .field>span,.field legend{opacity:.75}
+  .formats__heading>p,.reels__headline p,.gallery__headline p,.faq-item__a>p{opacity:.85}
+  .hero__sticker{font-size:10px}
+  .footer__orb{font-size:10px}
+  .tags span{padding:8px 11px}
+  .consent{font-size:13px;opacity:.85}
+}
+
+/* Мобильные правки по итогам проверки */
+@media(max-width:640px){
+  .format-row__name{font-size:10.4vw;letter-spacing:-.03em}
+  .portrait-scene__copy{font-size:clamp(34px,11vw,80px)}
+  .fact-card h3{font-size:min(44px,11.2vw)}
+  .hero__sticker--two{width:74px;height:74px;right:3vw;bottom:-112px}
+  .quick-contact__btn{height:48px}
+  .quick-contact__btn b{width:28px;height:28px}
+}
+.consent input{flex:0 0 20px;width:20px;height:20px;margin:0;accent-color:var(--ink)}

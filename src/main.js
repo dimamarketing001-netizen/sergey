@@ -81,14 +81,7 @@ async function loadContent(){
   }catch{return {}}
 }
 
-/* ---------- Контент из /data/content.json: цифры, площадки, отзывы, занятые даты ---------- */
-function renderStats(list){
-  const box=$('[data-stats]');
-  if(!box||!Array.isArray(list)||!list.length)return;
-  box.innerHTML=`<div class="stats__grid">${list.map(x=>`<div class="stats__item"><b>${esc(x.value)}</b><span>${esc(x.label)}</span></div>`).join('')}</div>`;
-  box.hidden=false;
-}
-
+/* ---------- Контент из /data/content.json: площадки, отзывы, занятые даты ---------- */
 function renderVenues(list){
   if(!Array.isArray(list)||!list.length)return;
   const after=$('.ticker--lime');
@@ -464,6 +457,7 @@ function formats(){
   $$('[data-format] .format-row__head').forEach(btn=>btn.addEventListener('click',()=>{
     const cur=btn.closest('[data-format]');
     const open=cur.classList.contains('is-open');
+    const top0=btn.getBoundingClientRect().top;
     $$('[data-format]').forEach(x=>{
       x.classList.remove('is-open');
       $('.format-row__head',x).setAttribute('aria-expanded','false');
@@ -473,7 +467,20 @@ function formats(){
       btn.setAttribute('aria-expanded','true');
     }
     sound.tick(open?420:640);
-    setTimeout(()=>ScrollTrigger.refresh(),300);
+
+    /* Раскрытие всегда идёт вниз: пока строки двигаются, удерживаем нажатый заголовок на месте экрана */
+    const t0=performance.now();
+    const hold=()=>{
+      const d=btn.getBoundingClientRect().top-top0;
+      if(Math.abs(d)>.5){
+        const y=scrollY+d;
+        if(lenis)lenis.scrollTo(y,{immediate:true,force:true});
+        else window.scrollTo({top:y,behavior:'instant'});
+      }
+      if(performance.now()-t0<950)requestAnimationFrame(hold);
+      else ScrollTrigger.refresh();
+    };
+    requestAnimationFrame(hold);
   }));
 
   if(!reduced){
@@ -701,7 +708,6 @@ async function init(){
   ]).catch(()=>{});
   await Promise.all([preloader(),fonts]);
   const content=await contentReady;
-  renderStats(content.stats);
   renderVenues(content.venues);
   renderReviews(content.reviews);
   dateGuard(content.busyDates);
