@@ -62,7 +62,7 @@ function outlineLetters(el, cls='split-char'){
   });
   el.replaceChildren(...out);
   el.classList.add('is-outlined');
-  el.style.setProperty('--word-em',total.toFixed(3));
+  el.parentElement.style.setProperty('--word-em',total.toFixed(3));
   return out;
 }
 

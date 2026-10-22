@@ -70,3 +70,12 @@ html,body{width:100%;max-width:100%;overflow-x:clip}main,header,footer,section,.
 .hero__line--outline{color:#fff}
 @media(hover:hover){.outline-char:hover{translate:0 -.04em}.outline-char:hover text{fill:var(--acid);stroke:var(--acid)}}
 @media(max-width:640px){.outline-char text{stroke-width:1.4px}.outline-char{filter:drop-shadow(0 0 6px rgba(255,255,255,.2))}}
+
+/* Имя и отчество — одного размера: кегль считается по ширине отчества, чтобы оно целиком помещалось в строку. */
+.hero__title,.footer__name{--fit:calc((100vw - 2*var(--pad) - 20px)/var(--word-em,10.4))}
+.hero__title{font-size:min(180px,var(--fit))}
+.footer__name{font-size:min(240px,var(--fit))}
+.hero__title .hero__line,.footer__name .footer__name-line{font-size:1em}
+@media(max-width:640px){.hero__title{font-size:min(110px,var(--fit))}.footer__name .footer__name-line{font-size:1em}}
+.outline-char{filter:drop-shadow(0 0 5px rgba(255,255,255,.14))}
+@media(max-width:640px){.outline-char text{stroke-width:1px;fill:none}}
