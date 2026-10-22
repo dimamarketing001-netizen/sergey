@@ -93,7 +93,8 @@ function renderVenues(list){
   if(!Array.isArray(list)||!list.length)return;
   const after=$('.ticker--lime');
   if(!after)return;
-  const row=list.map(esc).join(' ✳ ')+' ✳ ';
+  const star='<svg class="ico ico--star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg>';
+  const row=list.map(esc).join(star)+star;
   const sec=document.createElement('section');
   sec.className='ticker ticker--dark';
   sec.setAttribute('aria-label','Где проходили мероприятия');
@@ -606,7 +607,7 @@ function form(){
         form.hidden=true;
         success.hidden=false;
         form.reset();
-        toast('Заявка отправлена ✓');
+        toast('Заявка отправлена');
         if(!reduced)gsap.from(success.children,{y:30,opacity:0,stagger:.07});
       }else if(j.needsConfig){
         status.textContent='Автоматический приём заявок пока не настроен. Текст подготовлен для отправки через VK.';
