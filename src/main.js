@@ -1,6 +1,7 @@
 import './styles.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 gsap.registerPlugin(ScrollTrigger);
 
 const $=(s,r=document)=>r.querySelector(s);
@@ -67,6 +68,192 @@ function outlineLetters(el, cls='split-char'){
 }
 
 const splitAny=(el,cls)=>el.hasAttribute('data-outline')?outlineLetters(el,cls):splitLetters(el,cls);
+
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const finePointer=matchMedia('(hover:hover) and (pointer:fine)').matches;
+let lenis=null;
+let busyDates=new Set();
+
+async function loadContent(){
+  try{
+    const r=await fetch('/data/content.json',{cache:'no-cache'});
+    return r.ok?await r.json():{};
+  }catch{return {}}
+}
+
+/* ---------- Контент из /data/content.json: цифры, площадки, отзывы, занятые даты ---------- */
+function renderStats(list){
+  const box=$('[data-stats]');
+  if(!box||!Array.isArray(list)||!list.length)return;
+  box.innerHTML=`<div class="stats__grid">${list.map(x=>`<div class="stats__item"><b>${esc(x.value)}</b><span>${esc(x.label)}</span></div>`).join('')}</div>`;
+  box.hidden=false;
+}
+
+function renderVenues(list){
+  if(!Array.isArray(list)||!list.length)return;
+  const after=$('.ticker--lime');
+  if(!after)return;
+  const row=list.map(esc).join(' ✳ ')+' ✳ ';
+  const sec=document.createElement('section');
+  sec.className='ticker ticker--dark';
+  sec.setAttribute('aria-label','Где проходили мероприятия');
+  sec.innerHTML=`<div class="ticker__track"><span>${row}</span><span aria-hidden="true">${row}</span></div>`;
+  after.after(sec);
+}
+
+const REVIEW_TABS=[['all','Все'],['wedding','Свадьбы'],['corporate','Корпоративы'],['graduation','Выпускные'],['jubilee','Юбилеи']];
+
+function renderReviews(list){
+  const box=$('[data-reviews]');
+  if(!box||!Array.isArray(list)||!list.length)return;
+  const tabs=REVIEW_TABS.filter(([k])=>k==='all'||list.some(r=>r.type===k));
+  box.innerHTML=`
+    <div class="section-kicker"><span>05</span><span>отзывы</span><span>говорят заказчики</span></div>
+    <div class="reviews__head">
+      <h2 class="mega-title">ПОСЛЕ<br>ВЕЧЕРА<br><em>ПИШУТ.</em></h2>
+      <div class="reviews__tabs" role="tablist" aria-label="Тип мероприятия">${tabs.map(([k,l],i)=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${i===0}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="reviews__grid" data-review-grid></div>
+    <button class="reviews__more" type="button" data-review-more hidden>Показать ещё</button>`;
+  box.hidden=false;
+  const grid=$('[data-review-grid]',box),more=$('[data-review-more]',box);
+  const LIMIT=6;
+  let tab='all',expanded=false;
+  const draw=()=>{
+    const items=list.filter(r=>tab==='all'||r.type===tab);
+    const shown=tab==='all'&&!expanded?items.slice(0,LIMIT):items;
+    grid.innerHTML=shown.map(r=>`
+      <figure class="review">
+        <span class="review__mark" aria-hidden="true">“</span>
+        <blockquote>${esc(r.text)}</blockquote>
+        <figcaption><i aria-hidden="true">${esc([...String(r.name)][0]||'')}</i><span><b>${esc(r.name)}</b><small>${esc(r.meta)}</small></span></figcaption>
+      </figure>`).join('');
+    more.hidden=!(tab==='all'&&!expanded&&items.length>LIMIT);
+    if(!reduced)gsap.from($$('.review',grid),{y:30,opacity:0,duration:.6,stagger:.06,ease:'power3.out'});
+    ScrollTrigger.refresh();
+  };
+  $$('[data-tab]',box).forEach(b=>b.addEventListener('click',()=>{
+    tab=b.dataset.tab;expanded=false;
+    $$('[data-tab]',box).forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+    draw();
+  }));
+  more.addEventListener('click',()=>{expanded=true;draw();});
+  draw();
+}
+
+function dateGuard(list){
+  busyDates=new Set((Array.isArray(list)?list:[]).map(String));
+  const input=$('#leadForm input[name="date"]');
+  const hint=$('#dateHint');
+  if(!input)return;
+  const today=new Date();
+  input.min=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  if(!hint||!busyDates.size)return;
+  input.addEventListener('change',()=>{
+    const busy=busyDates.has(input.value);
+    hint.hidden=!busy;
+    hint.textContent=busy?'На эту дату уже есть бронь — всё равно оставьте заявку, подберём вариант.':'';
+  });
+}
+
+/* ---------- FAQ ---------- */
+function faq(){
+  $$('[data-faq] .faq-item__q').forEach(btn=>btn.addEventListener('click',()=>{
+    const item=btn.closest('.faq-item');
+    const open=item.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded',String(open));
+    sound.tick(open?640:420);
+  }));
+}
+
+/* ---------- Быстрая связь (VK / звонок) ---------- */
+function quickContact(){
+  const box=$('[data-quick]');
+  if(!box)return;
+  const hideOn=new Set();
+  const update=()=>box.classList.toggle('is-visible',scrollY>innerHeight*.7&&!hideOn.size);
+  addEventListener('scroll',update,{passive:true});
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>e.isIntersecting?hideOn.add(e.target):hideOn.delete(e.target));
+      update();
+    },{threshold:.15});
+    ['#lead','.footer'].forEach(sel=>{const el=$(sel);if(el)io.observe(el)});
+  }
+  update();
+}
+
+/* ---------- Превью видео в карточках ---------- */
+function reelPreviews(){
+  const save=navigator.connection&&navigator.connection.saveData;
+  if(reduced||save||!('IntersectionObserver' in window))return;
+  const io=new IntersectionObserver(entries=>entries.forEach(en=>{
+    const v=en.target;
+    if(en.isIntersecting){
+      if(!v.src)v.src=v.dataset.src;
+      v.play().then(()=>v.classList.add('is-playing')).catch(()=>{});
+    }else v.pause();
+  }),{threshold:.5});
+  $$('.reel-card__preview').forEach(v=>io.observe(v));
+}
+
+/* ---------- 3D-наклон карточек ---------- */
+function tilt(){
+  if(reduced||!finePointer)return;
+  $$('.reel-card').forEach(card=>{
+    card.addEventListener('pointermove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      card.style.setProperty('--rx',`${(-y*7).toFixed(2)}deg`);
+      card.style.setProperty('--ry',`${(x*9).toFixed(2)}deg`);
+    });
+    card.addEventListener('pointerleave',()=>{
+      card.style.setProperty('--rx','0deg');
+      card.style.setProperty('--ry','0deg');
+    });
+  });
+}
+
+/* ---------- Звук (по умолчанию выключен) ---------- */
+const sound=(()=>{
+  let ctx=null,on=false;
+  try{on=localStorage.getItem('sound')==='1'}catch{}
+  const btn=()=>$('[data-sound]');
+  const paint=()=>{const b=btn();if(!b)return;b.setAttribute('aria-pressed',String(on));b.textContent=`звук: ${on?'вкл':'выкл'}`};
+  return{
+    init(){
+      paint();
+      btn()?.addEventListener('click',()=>{
+        on=!on;
+        try{localStorage.setItem('sound',on?'1':'0')}catch{}
+        paint();
+        if(on)this.tick(760);
+      });
+    },
+    tick(freq=520){
+      if(!on)return;
+      try{
+        ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.type='sine';o.frequency.value=freq;
+        g.gain.setValueAtTime(.0001,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(.05,ctx.currentTime+.01);
+        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.14);
+        o.connect(g).connect(ctx.destination);
+        o.start();o.stop(ctx.currentTime+.16);
+      }catch{}
+    }
+  };
+})();
+
+/* ---------- Плавный скролл ---------- */
+function smoothScroll(){
+  if(reduced||!finePointer)return;
+  lenis=new Lenis({duration:1.1,smoothWheel:true});
+  lenis.on('scroll',ScrollTrigger.update);
+  gsap.ticker.add(t=>lenis.raf(t*1000));
+  gsap.ticker.lagSmoothing(0);
+}
 
 function splitWords(root){
   if(!root||root.dataset.wordsReady)return[];
@@ -281,6 +468,7 @@ function formats(){
       cur.classList.add('is-open');
       btn.setAttribute('aria-expanded','true');
     }
+    sound.tick(open?420:640);
     setTimeout(()=>ScrollTrigger.refresh(),300);
   }));
 
@@ -350,11 +538,13 @@ function videos(){
     v.setAttribute('aria-label','Видео с мероприятия');
     f.replaceChildren(v);
     m.showModal();
+    lenis?.stop();
     v.play().catch(()=>{});
   }));
   $('.video-modal__close',m)?.addEventListener('click',()=>m.close());
   m.addEventListener('click',e=>{if(e.target===m)m.close()});
-  m.addEventListener('close',stop);
+  m.setAttribute('data-lenis-prevent','');
+  m.addEventListener('close',()=>{stop();lenis?.start()});
 }
 
 function leadText(d){
@@ -480,13 +670,18 @@ function anchors(){
     const t=$(a.getAttribute('href'));
     if(!t)return;
     e.preventDefault();
-    t.scrollIntoView({behavior:reduced?'auto':'smooth'});
+    if(lenis)lenis.scrollTo(t,{offset:0});
+    else t.scrollIntoView({behavior:reduced?'auto':'smooth'});
   }));
 }
 
 async function init(){
   initAnalytics();
   analyticsClicks();
+  const contentReady=loadContent();
+  sound.init();
+  faq();
+  quickContact();
   nav();
   cursor();
   magnetic();
@@ -500,6 +695,14 @@ async function init(){
     new Promise(r=>setTimeout(r,2500))
   ]).catch(()=>{});
   await Promise.all([preloader(),fonts]);
+  const content=await contentReady;
+  renderStats(content.stats);
+  renderVenues(content.venues);
+  renderReviews(content.reviews);
+  dateGuard(content.busyDates);
+  smoothScroll();
+  tilt();
+  reelPreviews();
 
   hero();
   reveals();

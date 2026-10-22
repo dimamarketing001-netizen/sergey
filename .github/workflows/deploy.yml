@@ -1,0 +1,40 @@
+name: Deploy
+
+# Автодеплой на сервер при пуше в main.
+# Нужны секреты репозитория: SSH_HOST, SSH_USER, SSH_KEY (приватный ключ), SSH_PATH (папка сайта), SSH_PORT (необязательно).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build check
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - run: npm run build
+
+      - name: Pull, build and restart on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            cd "${{ secrets.SSH_PATH }}"
+            git pull --ff-only origin main
+            npm install
+            npm run build
+            sudo -n systemctl restart sergey-golovenkin.service || echo "restart skipped (no passwordless sudo)"
