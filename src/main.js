@@ -116,8 +116,8 @@ function renderReviews(list){
   const draw=()=>{
     const items=list.filter(r=>tab==='all'||r.type===tab);
     const shown=tab==='all'&&!expanded?items.slice(0,LIMIT):items;
-    grid.innerHTML=shown.map(r=>`
-      <figure class="review">
+    grid.innerHTML=shown.map((r,i)=>`
+      <figure class="review" style="--i:${i}">
         <span class="review__mark" aria-hidden="true">“</span>
         <blockquote>${esc(r.text)}</blockquote>
         <figcaption><i aria-hidden="true">${esc([...String(r.name)][0]||'')}</i><span><b>${esc(r.name)}</b><small>${esc(r.meta)}</small></span></figcaption>
@@ -211,9 +211,9 @@ function tilt(){
   });
 }
 
-/* ---------- Звук (по умолчанию включён, стартует с первого жеста) ---------- */
+/* ---------- Звук: спокойная праздничная музыка на фоне + «искристые» клики ---------- */
 const sound=(()=>{
-  let ctx=null,on=true,master=null,pad=null,unlocked=false;
+  let ctx=null,on=true,master=null,music=null,fx=null,verb=null,timer=0,nextT=0,stepN=0,unlocked=false;
   try{on=localStorage.getItem('sound')!=='0'}catch{}
   const btns=()=>$$('[data-sound]');
   const paint=()=>btns().forEach(b=>{
@@ -222,37 +222,90 @@ const sound=(()=>{
     if(b.classList.contains('sound-fab'))b.setAttribute('aria-label',on?'Выключить звук':'Включить звук');
     else b.textContent=`звук: ${on?'вкл':'выкл'}`;
   });
-  const ensure=()=>{
-    if(!ctx){
-      ctx=new (window.AudioContext||window.webkitAudioContext)();
-      master=ctx.createGain();master.gain.value=on?1:0;master.connect(ctx.destination);
-    }
-    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-    return ctx;
+  const hz=n=>440*2**((n-69)/12);
+  /* Cmaj9 – Am9 – Fmaj9 – Gadd9: светлая, мягкая, «праздничная» последовательность */
+  const CH=[[48,64,67,71,74],[45,64,67,72,76],[41,60,64,69,72],[43,62,66,71,74]].map(c=>c);
+  const ARP=[[0,1,2,3,4,3,2,1],[1,2,3,4,3,2,3,1]];
+  const build=()=>{
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
+    /* простая «комната»: затухающий стереошум */
+    const len=ctx.sampleRate*2.6,ir=ctx.createBuffer(2,len,ctx.sampleRate);
+    for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len)**2.4}
+    verb=ctx.createConvolver();verb.buffer=ir;
+    const vg=ctx.createGain();vg.gain.value=.55;verb.connect(vg).connect(master);
+    music=ctx.createGain();music.gain.value=.9;music.connect(master);music.connect(verb);
+    fx=ctx.createGain();fx.gain.value=1;fx.connect(master);
+    const send=ctx.createGain();send.gain.value=.5;fx.connect(send).connect(verb);
+    /* лёгкое эхо для искры */
+    const dl=ctx.createDelay(1);dl.delayTime.value=.375;const fb=ctx.createGain();fb.gain.value=.32;
+    const dg=ctx.createGain();dg.gain.value=.5;music.connect(dl);dl.connect(fb).connect(dl);dl.connect(dg).connect(master);
   };
-  /* мягкий «воздух»: три расстроенных синуса через фильтр + медленный LFO */
-  const startPad=()=>{
-    if(pad||!ctx)return;
-    const out=ctx.createGain();out.gain.value=0;
-    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;lp.Q.value=.7;
-    const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=.07;lg.gain.value=220;
-    lfo.connect(lg).connect(lp.frequency);lfo.start();
-    [110,164.81,220.5,277.2].forEach((f,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type=i%2?'triangle':'sine';o.frequency.value=f;o.detune.value=(i-1.5)*7;g.gain.value=.5/(i+1.4);
-      o.connect(g).connect(lp);o.start();
+  const bell=(dest,f,t,vol,dec=1.6)=>{
+    const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+dec);
+    g.connect(dest);
+    [[1,1],[2,.28],[4.1,.08]].forEach(([r,a])=>{
+      const o=ctx.createOscillator(),og=ctx.createGain();
+      o.type='sine';o.frequency.value=f*r;og.gain.value=a;
+      o.connect(og).connect(g);o.start(t);o.stop(t+dec+.05);
     });
-    lp.connect(out).connect(master);
-    out.gain.linearRampToValueAtTime(.05,ctx.currentTime+0.01);
-    out.gain.setTargetAtTime(.05,ctx.currentTime,3);
-    pad=out;
+  };
+  const padChord=(notes,t,dur)=>{
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1100;lp.Q.value=.3;
+    const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);
+    g.gain.linearRampToValueAtTime(.05,t+1.6);g.gain.setValueAtTime(.05,t+dur-.4);g.gain.linearRampToValueAtTime(.0001,t+dur+1.8);
+    lp.connect(g).connect(music);
+    notes.forEach((n,i)=>{
+      const o=ctx.createOscillator(),og=ctx.createGain();
+      o.type=i===0?'sine':'triangle';o.frequency.value=hz(n);o.detune.value=(i%2?5:-5);
+      og.gain.value=i===0?1.1:.55;o.connect(og).connect(lp);o.start(t);o.stop(t+dur+2);
+    });
+  };
+  const BPM=78,STEP=60/BPM/2;
+  const schedule=(n,t)=>{
+    const ci=Math.floor(n/16)%CH.length,s=n%16,ch=CH[ci];
+    if(s===0)padChord(ch,t,STEP*16);
+    if(s%8===0)bell(music,hz(ch[0]+12),t,.05,2.4);              // мягкий «колокольный» бас
+    if(s%2===0||Math.random()<.25){
+      const pat=ARP[Math.floor(n/16)%2],idx=pat[(s>>0)%8];
+      if(Math.random()<.78){
+        const note=ch[1+idx%4]+12;
+        bell(music,hz(note),t,.045+Math.random()*.012,1.5);
+        if(s%8===4&&Math.random()<.5)bell(music,hz(note+12),t+STEP*.5,.022,1);
+      }
+    }
+  };
+  const pump=()=>{
+    while(nextT<ctx.currentTime+.5){schedule(stepN,nextT);nextT+=STEP;stepN++}
+  };
+  const startMusic=()=>{
+    if(timer||!ctx)return;
+    nextT=ctx.currentTime+.15;
+    pump();timer=setInterval(pump,150);
+  };
+  const stopMusic=()=>{clearInterval(timer);timer=0};
+  const setOn=v=>{
+    on=v;
+    if(!ctx)return;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setTargetAtTime(on?1:0,ctx.currentTime,on?.8:.15);
+    if(on){startMusic()}else setTimeout(()=>{if(!on)stopMusic()},600);
+  };
+  const ensure=()=>{
+    if(!ctx)build();
+    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
   };
   const unlock=()=>{
     if(unlocked)return;unlocked=true;
     ['pointerdown','touchend','keydown','click'].forEach(e=>window.removeEventListener(e,unlock,true));
     if(!on)return;
-    try{ensure();startPad()}catch{}
+    try{ensure();setOn(true)}catch{}
   };
+  document.addEventListener('visibilitychange',()=>{
+    if(!ctx||!on)return;
+    if(document.hidden)ctx.suspend().catch(()=>{});else ctx.resume().catch(()=>{});
+  });
   return{
     get on(){return on},
     init(){
@@ -260,27 +313,28 @@ const sound=(()=>{
       ['pointerdown','touchend','keydown','click'].forEach(e=>window.addEventListener(e,unlock,{capture:true,passive:true}));
       btns().forEach(b=>b.addEventListener('click',e=>{
         e.stopPropagation();
-        on=!on;
+        try{ensure();unlocked=true;setOn(!on)}catch{on=!on}
         try{localStorage.setItem('sound',on?'1':'0')}catch{}
         paint();
-        try{
-          ensure();startPad();
-          master.gain.setTargetAtTime(on?1:0,ctx.currentTime,.12);
-          unlocked=true;
-          if(on)this.tick(760);
-        }catch{}
+        if(on)setTimeout(()=>this.tick(880),60);
       }));
     },
+    /* клик/наведение: искристый «звоночек» с коротким взлётом */
     tick(freq=520,vol=.05,len=.14){
-      if(!on||!ctx||!unlocked)return;
+      if(!on||!ctx||!unlocked||ctx.state!=='running')return;
       try{
-        const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;
-        o.type='sine';o.frequency.value=freq;
-        g.gain.setValueAtTime(.0001,t);
-        g.gain.exponentialRampToValueAtTime(vol,t+.01);
-        g.gain.exponentialRampToValueAtTime(.0001,t+len);
-        o.connect(g).connect(master);
-        o.start(t);o.stop(t+len+.02);
+        const t=ctx.currentTime;
+        if(vol<.03){bell(fx,freq*1.5,t,.05,.5);return}
+        bell(fx,freq,t,.16,1.1);
+        bell(fx,freq*1.5,t+.055,.1,.9);
+        bell(fx,freq*2,t+.11,.08,.8);
+        const nb=ctx.createBuffer(1,ctx.sampleRate*.18,ctx.sampleRate),d=nb.getChannelData(0);
+        for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+        const ns=ctx.createBufferSource(),bp=ctx.createBiquadFilter(),ng=ctx.createGain();
+        ns.buffer=nb;bp.type='bandpass';bp.Q.value=1.2;
+        bp.frequency.setValueAtTime(1800,t);bp.frequency.exponentialRampToValueAtTime(7000,t+.16);
+        ng.gain.setValueAtTime(.05,t);ng.gain.exponentialRampToValueAtTime(.0001,t+.17);
+        ns.connect(bp).connect(ng).connect(fx);ns.start(t);
       }catch{}
     }
   };
@@ -926,7 +980,6 @@ async function init(){
   renderReviews(content.reviews);
   dateGuard(content.busyDates);
   smoothScroll();
-  backdrop($('.hero'),{count:120});
   backdrop($('.footer'),{count:80,hue:'#c8c6ff'});
   tilt();
   hoverSound();
