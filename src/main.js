@@ -143,17 +143,20 @@ function renderReviews(list){
 }
 
 function dateGuard(list){
-  busyDates=new Set((Array.isArray(list)?list:[]).map(String));
+  const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  // сегодня и ближайшие три дня считаются занятыми всегда
+  const rolling=[0,1,2,3].map(n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)});
+  busyDates=new Set([...(Array.isArray(list)?list:[]).map(String),...rolling]);
   const input=$('#leadForm input[name="date"]');
   const hint=$('#dateHint');
   if(!input)return;
   const today=new Date();
-  input.min=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  input.min=iso(today);
   if(!hint||!busyDates.size)return;
   input.addEventListener('change',()=>{
     const busy=busyDates.has(input.value);
     hint.hidden=!busy;
-    hint.textContent=busy?'На эту дату уже есть бронь — всё равно оставьте заявку, подберём вариант.':'';
+    hint.textContent=busy?'На эту дату мой календарь занят — оставьте заявку, обсудим другие варианты.':'';
   });
 }
 
