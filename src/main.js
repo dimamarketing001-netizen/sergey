@@ -521,6 +521,92 @@ function hero(){
   });
 }
 
+/* ---------- Прожектор: под курсором фото проявляется в цвете ---------- */
+function spotlight(){
+  const hero=$('.hero'),media=$('.hero__media'),color=$('.hero__color');
+  if(!hero||!color||reduced||!finePointer)return;
+  let x=0,y=0,tx=0,ty=0,r=0,tr=0,raf=0;
+  const loop=()=>{
+    x+=(tx-x)*.16;y+=(ty-y)*.16;r+=(tr-r)*.12;
+    color.style.setProperty('--mx',x.toFixed(1)+'px');
+    color.style.setProperty('--my',y.toFixed(1)+'px');
+    color.style.setProperty('--mr',r.toFixed(1)+'px');
+    raf=(Math.abs(tx-x)+Math.abs(ty-y)+Math.abs(tr-r)>.5)?requestAnimationFrame(loop):0;
+  };
+  const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
+  hero.addEventListener('pointermove',e=>{
+    const b=media.getBoundingClientRect(),first=r<1&&tr<1;
+    tx=e.clientX-b.left;ty=e.clientY-b.top;tr=210;
+    if(first){x=tx;y=ty}
+    kick();
+  },{passive:true});
+  hero.addEventListener('pointerleave',()=>{tr=0;kick()});
+}
+
+/* ---------- Магнитные буквы имени: расходятся от курсора ---------- */
+function magnetLetters(){
+  const hero=$('.hero');
+  if(!hero||reduced||!finePointer)return;
+  const letters=$$('.hero__title .split-char');
+  if(!letters.length)return;
+  let mx=-9999,my=-9999,raf=0;
+  const state=new Map(letters.map(l=>[l,{x:0,y:0}]));
+  const step=()=>{
+    let moving=false;
+    for(const l of letters){
+      const b=l.getBoundingClientRect(),s=state.get(l);
+      const cx=b.left+b.width/2,cy=b.top+b.height/2;
+      const dx=cx-mx,dy=cy-my,d=Math.hypot(dx,dy)||1;
+      const f=d<220?(1-d/220)**1.6:0;
+      const k=Math.min(b.height*.14,22);
+      const gx=dx/d*f*k*.25,gy=dy/d*f*k;
+      s.x+=(gx-s.x)*.18;s.y+=(gy-s.y)*.18;
+      if(Math.abs(s.x)>.05||Math.abs(s.y)>.05||f>0)moving=true;
+      l.style.translate=`${s.x.toFixed(1)}px ${s.y.toFixed(1)}px`;
+    }
+    raf=moving?requestAnimationFrame(step):0;
+  };
+  const kick=()=>{if(!raf)raf=requestAnimationFrame(step)};
+  hero.addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;kick()},{passive:true});
+  hero.addEventListener('pointerleave',()=>{mx=my=-9999;kick()});
+}
+
+/* ---------- Конфетти при отправке заявки ---------- */
+function confetti(from){
+  if(reduced)return;
+  const cv=document.createElement('canvas');
+  cv.setAttribute('aria-hidden','true');
+  cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9000';
+  document.body.appendChild(cv);
+  const dpr=Math.min(devicePixelRatio||1,2),W=innerWidth,H=innerHeight;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const c=cv.getContext('2d');c.scale(dpr,dpr);
+  const b=from?.getBoundingClientRect(),ox=b?b.left+b.width/2:W/2,oy=b?b.top+b.height/2:H*.6;
+  const cols=['#dfff38','#ff5a36','#c8c6ff','#ffffff','#f3f0e9'];
+  const n=innerWidth<700?110:190;
+  const P=Array.from({length:n},()=>{
+    const a=-Math.PI/2+(Math.random()-.5)*2.3,v=7+Math.random()*13;
+    return{x:ox,y:oy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,w:5+Math.random()*7,h:3+Math.random()*5,r:Math.random()*6.28,vr:(Math.random()-.5)*.4,col:cols[Math.random()*cols.length|0],circ:Math.random()<.25};
+  });
+  const t0=performance.now();
+  const frame=t=>{
+    const el=t-t0;
+    c.clearRect(0,0,W,H);
+    for(const p of P){
+      p.vy+=.28;p.vx*=.992;p.vy*=.992;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      c.save();c.translate(p.x,p.y);c.rotate(p.r);
+      c.globalAlpha=Math.max(0,Math.min(1,(3200-el)/900));
+      c.fillStyle=p.col;
+      if(p.circ){c.beginPath();c.arc(0,0,p.w/2,0,6.283);c.fill()}
+      else c.fillRect(-p.w/2,-p.h/2,p.w,p.h*Math.abs(Math.cos(p.r*1.7)+.2));
+      c.restore();
+    }
+    if(el<3200)requestAnimationFrame(frame);else cv.remove();
+  };
+  requestAnimationFrame(frame);
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>sound.tick(f,.06,.35),i*90));
+}
+
 function reveals(){
   if(reduced)return;
   $$('[data-reveal-line],.section-kicker,.mega-title').forEach(el=>{
@@ -734,8 +820,11 @@ function form(){
         trackGoal('lead_submit_success', {event:d.event});
         form.hidden=true;
         success.hidden=false;
+        const sb=success.getBoundingClientRect();
         form.reset();
         toast('Заявка отправлена');
+        success.scrollIntoView({block:'center',behavior:reduced?'auto':'smooth'});
+        confetti({getBoundingClientRect:()=>({left:sb.left,top:innerHeight*.66,width:sb.width||innerWidth,height:0})});
         if(!reduced)gsap.from(success.children,{y:30,opacity:0,stagger:.07});
       }else if(j.needsConfig){
         status.textContent='Автоматический приём заявок пока не настроен. Текст подготовлен для отправки через VK.';
@@ -837,6 +926,8 @@ async function init(){
   reelPreviews();
 
   hero();
+  spotlight();
+  magnetLetters();
   reveals();
   stack();
   portrait();
