@@ -142,8 +142,6 @@ html,body{width:100%;max-width:100%;overflow-x:clip}main,header,footer,section,.
 @media(max-width:640px){.quick-contact{flex-direction:row;left:12px;right:12px;justify-content:center}.quick-contact__btn{flex:1;justify-content:center;padding:0 12px}}
 
 /* Подвал: плавный переход из лаймового блока и кнопка звука */
-.footer{padding-top:140px}
-.footer:before{content:"";position:absolute;inset:0 0 auto;height:130px;background:linear-gradient(var(--acid),var(--ink));pointer-events:none}
 .sound-toggle{border:0;background:none;padding:0;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
 /* Модальное окно видео — под вертикальные ролики */

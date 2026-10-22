@@ -638,11 +638,12 @@ function footer(){
   if(!reduced){
     gsap.from(chars,{
       yPercent:125,
-      rotate:4,
-      duration:1.05,
-      stagger:.015,
+      rotate:6,
+      opacity:0,
+      duration:1.3,
+      stagger:.035,
       ease:'power4.out',
-      scrollTrigger:{trigger:'.footer__name',start:'top 84%',once:true}
+      scrollTrigger:{trigger:'.footer__name',start:'top 92%',once:true}
     });
     gsap.from('.footer__orb',{
       scale:0,
