@@ -214,5 +214,4 @@ html,body{width:100%;max-width:100%;overflow-x:clip}main,header,footer,section,.
 /* ---- прожектор и магнитные буквы ---- */
 .hero__media .hero__color{position:absolute;left:0;top:0;filter:saturate(1.25) brightness(1.18);pointer-events:none;opacity:1;-webkit-mask-image:radial-gradient(circle var(--mr,0px) at var(--mx,50%) var(--my,50%),#000 0,rgba(0,0,0,.65) 45%,transparent 100%);mask-image:radial-gradient(circle var(--mr,0px) at var(--mx,50%) var(--my,50%),#000 0,rgba(0,0,0,.65) 45%,transparent 100%)}
 .hero__title .split-char{will-change:translate}
-@media(hover:none),(pointer:coarse){.hero__media .hero__color{display:none}}
 @media(prefers-reduced-motion:reduce){.hero__media .hero__color{display:none}}

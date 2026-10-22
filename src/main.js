@@ -524,23 +524,30 @@ function hero(){
 /* ---------- Прожектор: под курсором фото проявляется в цвете ---------- */
 function spotlight(){
   const hero=$('.hero'),media=$('.hero__media'),color=$('.hero__color');
-  if(!hero||!color||reduced||!finePointer)return;
-  let x=0,y=0,tx=0,ty=0,r=0,tr=0,raf=0;
+  if(!hero||!color||reduced)return;
+  const R=finePointer?210:150;
+  let x=0,y=0,tx=0,ty=0,r=0,tr=0,raf=0,hideT=0;
   const loop=()=>{
-    x+=(tx-x)*.16;y+=(ty-y)*.16;r+=(tr-r)*.12;
+    x+=(tx-x)*.2;y+=(ty-y)*.2;r+=(tr-r)*.14;
     color.style.setProperty('--mx',x.toFixed(1)+'px');
     color.style.setProperty('--my',y.toFixed(1)+'px');
     color.style.setProperty('--mr',r.toFixed(1)+'px');
     raf=(Math.abs(tx-x)+Math.abs(ty-y)+Math.abs(tr-r)>.5)?requestAnimationFrame(loop):0;
   };
   const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
-  hero.addEventListener('pointermove',e=>{
+  const point=e=>{
+    clearTimeout(hideT);
     const b=media.getBoundingClientRect(),first=r<1&&tr<1;
-    tx=e.clientX-b.left;ty=e.clientY-b.top;tr=210;
+    tx=e.clientX-b.left;ty=e.clientY-b.top;tr=R;
     if(first){x=tx;y=ty}
     kick();
-  },{passive:true});
-  hero.addEventListener('pointerleave',()=>{tr=0;kick()});
+  };
+  const off=(delay=0)=>{clearTimeout(hideT);hideT=setTimeout(()=>{tr=0;kick()},delay)};
+  hero.addEventListener('pointermove',point,{passive:true});
+  hero.addEventListener('pointerdown',point,{passive:true});
+  hero.addEventListener('pointerleave',()=>off());
+  hero.addEventListener('pointerup',()=>off(finePointer?0:700));
+  hero.addEventListener('pointercancel',()=>off(200));
 }
 
 /* ---------- Магнитные буквы имени: расходятся от курсора ---------- */
